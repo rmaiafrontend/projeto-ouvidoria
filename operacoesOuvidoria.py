@@ -7,9 +7,10 @@ sqlListarMafinestacoes = 'select * from manifestacoes;'
 def listar_manifestacoes():
     manifestacoes = listarBancoDados(conexao, sqlListarMafinestacoes)
     if len(manifestacoes) > 0:
-        print('Manifestações cadastradas')
-        for manifestacao in (manifestacoes):
-            print(manifestacao)
+        print('Manifestações cadastradas:')
+        for protocolo, descricao in manifestacoes:
+            manifestacao_formatada = f"{protocolo} - {descricao}"
+            print(manifestacao_formatada)
     else:
         print('Não há manifestações a serem exibidas.')
 
@@ -43,8 +44,7 @@ def criar_manifestacao(listaManifestacoes):
 
             insertNoBancoDados(conexao, insertManifestacao, dado)
             protocolo = len(manifestacoes) + 1
-            print('Manifestação cadastrada com sucesso, seu protocolo é: %d' %
-                  protocolo)
+            print('Manifestação cadastrada com sucesso!')
 
 
 def exibir_quantidade_manifestacoes():
@@ -52,16 +52,21 @@ def exibir_quantidade_manifestacoes():
     print(f'Até o momento, você abriu exatas {len(manifestacoes)} manifestações')
 
 def pesquisar_manifestacao():
-    manifestacoes = listarBancoDados(conexao, sqlListarMafinestacoes)
-    if len(manifestacoes) != 0:
-        listar_manifestacoes()
-        protocolo = int(input('Informe o protocolo da manifestação:\n '))
-        if protocolo > len(manifestacoes) or protocolo < 1:
-            print('Protocoloco invalido')
-        else:
-            print(manifestacoes[protocolo - 1])
+    listar_manifestacoes()
+    protocolo = int(input('Informe o protocolo da manifestação:\n '))
+
+    sqlPesquisarManifestacao = f'SELECT * FROM manifestacoes WHERE protocolo = {protocolo}'
+
+    manifestacao = listarBancoDados(conexao, sqlPesquisarManifestacao)
+
+    if len(manifestacao) > 0:
+        print('Manifestação encontrada:')
+        for protocolo, descricao in manifestacao:
+            manifestacao_formatada = f"{protocolo} - {descricao}"
+            print(manifestacao_formatada)
+
     else:
-        print('Não há manifestações a serem exibidas.')
+        print('Manifestação não encontrada.')
 
 def remover_manifestacao():
     manifestacoes = listarBancoDados(conexao, sqlListarMafinestacoes)
@@ -81,7 +86,7 @@ def alterar_manifestacao():
     if len(manifestacoes) != 0:
         listar_manifestacoes()
         protocolo = int(input('Informe o número do protocolo da manifestação a ser alterada:\n '))
-        if 1 <= protocolo <= len(manifestacoes):
+        if 1 <= protocolo:
             novaDescricao = input("Digite a nova descrição da manifestação: ")
             updateManifestacao = "UPDATE manifestacoes SET descricao = %s WHERE protocolo = %s"
             dados = [novaDescricao, protocolo]
@@ -91,4 +96,8 @@ def alterar_manifestacao():
             print('Protocolo inválido!')
     else:
         print("Não há manifestações a serem alteradas.")
+
+
+
+
 
